@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './index.scss';
 
 const questions = [
@@ -22,37 +23,49 @@ const questions = [
   },
 ];
 
-function Result() {
+function Result({goals}) {
   return (
     <div className="result">
-      <img src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png" />
-      <h2>Вы отгадали 3 ответа из 10</h2>
-      <button>Попробовать снова</button>
+      <img alt="cool" src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png" />
+      <h2>Вы отгадали {goals} ответа из {questions.length}</h2>
+      <a href='/'> 
+        <button>Попробовать снова</button>
+      </a>
     </div>
   );
 }
 
-function Game() {
+function Game({ step, question, nextStep }) {
+  const percentage = Math.round(step / questions.length * 100);
   return (
     <>
       <div className="progress">
-        <div style={{ width: '50%' }} className="progress__inner"></div>
+        <div style={{ width: `${percentage}%` }} className="progress__inner"></div>
       </div>
-      <h1>Что такое useState?</h1>
+      <h1>{question.title}</h1>
       <ul>
-        <li>Это функция для хранения данных компонента</li>
-        <li>Это глобальный стейт</li>
-        <li>Это когда на ты никому не нужен</li>
+        {question.variants.map((variant, index) =>
+          <li key={index} onClick={() => nextStep(index)}>{variant}</li>
+        )}
       </ul>
     </>
   );
 }
 
 function App() {
+  const [step, setStep] = useState(0);
+  const [goals, setGoals] = useState(0);
+
+  const nextStep = (key) => {
+    setStep(step + 1);
+    if (key === questions[step].correct) setGoals(goals + 1);
+  }
+
   return (
     <div className="App">
-      <Game />
-      {/* <Result /> */}
+      {
+        step <= questions.length ? <Game step={step} question={questions[step]} nextStep={nextStep} /> : <Result goals={goals}/>
+      }
     </div>
   );
 }
